@@ -1,10 +1,9 @@
 import numpy as np
+import cv2
 
 from os import listdir # para hacer lista de archivos en una ruta
 from tqdm import tqdm  # para crear contador en un for para ver evolución
 from os.path import join # para unir ruta con archivo 
-import cv2 # para leer imagenes jpg
-
 
 def img2data(path, width=100):
     
