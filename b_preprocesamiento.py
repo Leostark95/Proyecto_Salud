@@ -93,11 +93,13 @@ df_summary["Class Percentage"] = ((df_summary["Image Count"] / df_summary["Total
 print("Análisis Descriptivo del Balance de Clases:")
 print(df_summary)
 
+# ---------------------------------- Función img2data aplicada ------------------------------ #
+
+rawImgs, labels, _ = img2data(dataset_dir + "/train/", width=100)
+
 # ---------------------------------- Visualización de imágenes ------------------------------ #
 
 num_images = 5
-rawImgs, labels, _ = img2data(dataset_dir + "/train/", width=100)
-
 # Convertir la lista de imágenes y etiquetas a un DataFrame para manipularlas fácilmente
 data = {"Image": rawImgs, "Label": [label[0] for label in labels]}
 
@@ -125,14 +127,17 @@ def normalize_images(images):
     images_normalized = np.array(images, dtype="float32") / 255.0
     return images_normalized
 
+# Aplicar normalización
+rawImgs_normalized = normalize_images(rawImgs)
+
+# Confirmar si todas las imágenes tienen la misma dimensión
+unique_sizes = set(img.shape for img in rawImgs_normalized)
+if len(unique_sizes) == 1:
+    print("\nTodas las imágenes normalizadas tienen las mismas dimensiones:", unique_sizes.pop())
+else:
+    print("\nLas imágenes tienen diferentes dimensiones:", unique_sizes)
+
 # --------------------------------------- Aumento de datos ---------------------------------- #
-
-
-
-
-
-
-
 
 # Definir una secuencia de aumento de datos
 augmentation_pipeline = iaa.Sequential([
@@ -156,8 +161,6 @@ def plot_image_samples(images, title, num_images=5):
     plt.suptitle(title)
     plt.show()
 
-# Cargar las imágenes
-rawImgs, labels, _ = img2data(dataset_dir + "/train/", width=100)
 plot_image_samples(rawImgs, title="Imágenes Originales")
 
 # Normalizar las imágenes
@@ -168,39 +171,13 @@ plot_image_samples(rawImgs_normalized, title="Imágenes Normalizadas")
 rawImgs_augmented = augment_images(rawImgs_normalized)
 plot_image_samples(rawImgs_augmented, title="Imágenes con Aumento de Datos")
 
-
-# Aplicar normalización
-rawImgs_normalized = normalize_images(rawImgs)
-
-# Verificar dimensiones de las imágenes normalizadas
-print("Dimensiones de las imágenes normalizadas:")
-for i, img in enumerate(rawImgs_normalized[:5]):  # Muestra las primeras 5 imágenes como ejemplo
-    print(f"Imagen {i + 1}: {img.shape}")
-
-# Confirmar si todas las imágenes tienen la misma dimensión
-unique_sizes = set(img.shape for img in rawImgs_normalized)
-if len(unique_sizes) == 1:
-    print("\nTodas las imágenes normalizadas tienen las mismas dimensiones:", unique_sizes.pop())
-else:
-    print("\nLas imágenes tienen diferentes dimensiones:", unique_sizes)
-
-
-
-
-
-
-
-
-
-
-
-
+# -------------------------------------- Train, Test, Valid --------------------------------- #
 
 # para cargar todas las imágenes
 # reducir su tamaño y convertir en array
 
-#width = 100
-#num_classes = 2 
+width = 100
+num_classes = 2
 trainpath = 'data/train/'
 testpath = 'data/test/'
 valpath = 'data/valid/'
@@ -235,21 +212,3 @@ joblib.dump(x_test, "salidas\\x_test.pkl")
 joblib.dump(y_test, "salidas\\y_test.pkl")
 joblib.dump(x_val, "salidas\\x_val.pkl")
 joblib.dump(y_val, "salidas\\y_val.pkl")
-
-# Calcular la cantidad de imágenes por clase en cada conjunto
-train_counts = np.unique(y_train, return_counts=True)
-val_counts = np.unique(y_val, return_counts=True)
-test_counts = np.unique(y_test, return_counts=True)
-
-# Imprimir resultados
-print("Distribución en el conjunto de entrenamiento:")
-print(f"Clase 0 (Normal): {train_counts[1][0]}")
-print(f"Clase 1 (Pneumonia): {train_counts[1][1]}")
-
-print("\nDistribución en el conjunto de validación:")
-print(f"Clase 0 (Normal): {val_counts[1][0]}")
-print(f"Clase 1 (Pneumonia): {val_counts[1][1]}")
-
-print("\nDistribución en el conjunto de prueba:")
-print(f"Clase 0 (Normal): {test_counts[1][0]}")
-print(f"Clase 1 (Pneumonia): {test_counts[1][1]}")
