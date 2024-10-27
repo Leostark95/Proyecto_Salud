@@ -95,7 +95,7 @@ print(df_summary)
 
 # ---------------------------------- Función img2data aplicada ------------------------------ #
 
-rawImgs, labels, _ = img2data(dataset_dir + "/train/", width=100)
+rawImgs, labels, _ = img2data(dataset_dir + "/train/")
 
 # ---------------------------------- Visualización de imágenes ------------------------------ #
 
@@ -140,14 +140,13 @@ else:
 # --------------------------------------- Aumento de datos ---------------------------------- #
 
 # Definir una secuencia de aumento de datos
-augmentation_pipeline = iaa.Sequential([
-    iaa.Fliplr(0.5),                    # 50% de probabilidad de aplicar espejado horizontal
-    iaa.Rotate((-15, 15)),              # Rotar entre -15 y 15 grados
-    iaa.Multiply((0.8, 1.2)),           # Ajuste de brillo entre 80% y 120%
-    iaa.GaussianBlur(sigma=(0.0, 1.0))  # Aplicar desenfoque gaussiano leve
-])
 
 def augment_images(images):
+    augmentation_pipeline = iaa.Sequential([
+    iaa.Fliplr(0.5),                       # 50% de probabilidad de aplicar espejado horizontal
+    iaa.Rotate((-15, 15)),                 # Rotar entre -15 y 15 grados
+    iaa.Multiply((0.8, 1.2)),              # Ajuste de brillo entre 80% y 120%
+    iaa.GaussianBlur(sigma=(0.0, 1.0))])   # Aplicar desenfoque gaussiano leve
     # Aplicar el aumento de datos a las imágenes
     images_augmented = augmentation_pipeline(images=images)
     return images_augmented
@@ -176,13 +175,48 @@ plot_image_samples(rawImgs_augmented, title="Imágenes con Aumento de Datos")
 # para cargar todas las imágenes
 # reducir su tamaño y convertir en array
 
-width = 100
-num_classes = 2
 trainpath = 'data/train/'
 testpath = 'data/test/'
 valpath = 'data/valid/'
 
 x_train, y_train, file_list= fn.img2data(trainpath)
+
+# Normalizar las imágenes y actualizar x_train
+x_train_norm = normalize_images(x_train)
+plot_image_samples(x_train, title="Imágenes Normalizadas")
+
+# Aplicar aumento de datos y actualizar x_train
+x_train_aug = augment_images(x_train)
+plot_image_samples(x_train, title="Imágenes con Aumento de Datos")
+
+x_train = []
+
+x_train.append(x_train_norm)
+x_train.append(x_train_aug)
+
+print(len(x_train_norm))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 x_test, y_test, file_list = fn.img2data(testpath)
 x_val, y_val, file_list = fn.img2data(valpath) 
 
