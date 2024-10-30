@@ -183,3 +183,24 @@ plt.show()
 report = classification_report(y_test, y_pred, target_names=['Negativo', 'Positivo'])
 print("Reporte de Clasificación:")
 print(report)
+
+# ------------------------------------------ CNN2 ------------------------------------------ #
+
+cnn2 = tf.keras.Sequential([
+    tf.keras.layers.Conv2D(16, kernel_size=(3, 3), activation='relu', input_shape=x_train.shape[1:]),
+    tf.keras.layers.MaxPooling2D(pool_size=(2, 2)),
+    tf.keras.layers.Conv2D(32, kernel_size=(3, 3), activation='relu'),
+    tf.keras.layers.MaxPooling2D(pool_size=(2, 2)),
+    tf.keras.layers.Flatten(),
+    tf.keras.layers.Dense(64, activation='relu'),
+    tf.keras.layers.Dense(1, activation='sigmoid')
+])
+
+# Compile the model with binary cross-entropy loss and Adam optimizer
+cnn2.compile(loss='binary_crossentropy', optimizer='adam', metrics=['AUC'])
+
+# Train the model for 10 epochs
+cnn2.fit(x_train, y_train, batch_size=100, epochs=10, validation_data=(x_test, y_test))
+
+
+cnn2.summary()

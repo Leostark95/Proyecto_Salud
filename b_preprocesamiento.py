@@ -133,36 +133,6 @@ x_train, y_train, file_list= fn.img2data(trainpath)
 x_test, y_test, file_list= fn.img2data(testpath)
 x_val, y_val, file_list= fn.img2data(valpath)
 
-joblib.dump(x_train, 'salidas/x_train.pkl')
-joblib.dump(y_train, 'salidas/y_train.pkl')
-joblib.dump(x_test,'salidas/x_test.pkl')
-joblib.dump(y_test, 'salidas/y_test.pkl')
-joblib.dump(x_val, 'salidas/x_val.pkl')
-joblib.dump(y_val, 'salidas/y_val.pkl')
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-x_test, y_test, file_list = fn.img2data(testpath)
-x_val, y_val, file_list = fn.img2data(valpath) 
-
 #### convertir salidas a numpy array ####
 x_train = np.array(x_train)
 y_train = np.array(y_train)
@@ -175,17 +145,11 @@ x_train.shape
 x_test.shape
 x_val.shape
 
-
-np.prod(x_train[1].shape)
-y_train.shape
-y_test.shape
-y_val.shape
-
 # ----------------------- salidas del preprocesamiento bases listas ------------------------- #
 
-joblib.dump(x_train, "salidas\\x_train.pkl")
-joblib.dump(y_train, "salidas\\y_train.pkl")
-joblib.dump(x_test, "salidas\\x_test.pkl")
-joblib.dump(y_test, "salidas\\y_test.pkl")
-joblib.dump(x_val, "salidas\\x_val.pkl")
-joblib.dump(y_val, "salidas\\y_val.pkl")
+joblib.dump(x_train, 'salidas/x_train.pkl')
+joblib.dump(y_train, 'salidas/y_train.pkl')
+joblib.dump(x_test,'salidas/x_test.pkl')
+joblib.dump(y_test, 'salidas/y_test.pkl')
+joblib.dump(x_val, 'salidas/x_val.pkl')
+joblib.dump(y_val, 'salidas/y_val.pkl')
