@@ -196,11 +196,242 @@ cnn2 = tf.keras.Sequential([
     tf.keras.layers.Dense(1, activation='sigmoid')
 ])
 
-# Compile the model with binary cross-entropy loss and Adam optimizer
-cnn2.compile(loss='binary_crossentropy', optimizer='adam', metrics=['AUC'])
+cnn2.compile(
+    optimizer='adam',
+    loss='binary_crossentropy',
+    metrics=[
+        metrics.Recall(name='recall'),
+        metrics.Precision(name='precision'),
+        metrics.AUC(name='auc')
+        # F1 score personalizado si es necesario
+    ]
+)
 
-# Train the model for 10 epochs
-cnn2.fit(x_train, y_train, batch_size=100, epochs=10, validation_data=(x_test, y_test))
+history2 = cnn2.fit(
+                x_train,
+                y_train,
+                batch_size=100,
+                epochs = 10,
+                validation_data = (x_test, y_test)
+)
 
+# Evaluar el modelo en el conjunto de prueba
+test_loss, test_recall, test_precision, test_auc = cnn2.evaluate(x_test, y_test)
 
 cnn2.summary()
+
+# Gráfica de Recall
+plt.plot(history2.history['recall'], label='Recall en el entrenamiento')
+plt.plot(history2.history['val_recall'], label='Recall en la validación')
+plt.title('Recall durante el entrenamiento')
+plt.xlabel('Épocas')
+plt.ylabel('Recall')
+plt.legend()
+plt.show()
+
+# Gráfica de Precisión
+plt.plot(history2.history['precision'], label='Precisión en el entrenamiento')
+plt.plot(history2.history['val_precision'], label='Precisión en la validación')
+plt.title('Precisión durante el entrenamiento')
+plt.xlabel('Épocas')
+plt.ylabel('Precisión')
+plt.legend()
+plt.show()
+
+# Gráfica de AUC
+plt.plot(history2.history['auc'], label='AUC en el entrenamiento')
+plt.plot(history2.history['val_auc'], label='AUC en la validación')
+plt.title('AUC durante el entrenamiento')
+plt.xlabel('Épocas')
+plt.ylabel('AUC')
+plt.legend()
+plt.show()
+
+# Gráfica de Pérdida
+plt.plot(history2.history['loss'], label='Pérdida en el entrenamiento')
+plt.plot(history2.history['val_loss'], label='Pérdida en la validación')
+plt.title('Pérdida durante el entrenamiento')
+plt.xlabel('Épocas')
+plt.ylabel('Pérdida')
+plt.legend()
+plt.show()
+
+# -------------------------------- Dropout y regularización -------------------------------- #
+
+#######probar una red con regulzarización L2
+reg_strength = 0.001
+
+###########Estrategias a usar: regilarization usar una a la vez para ver impacto
+dropout_rate = 0.1  
+
+# ------------------------------------------ CNN3 ------------------------------------------ #
+
+cnn3 = tf.keras.Sequential([
+    tf.keras.layers.Conv2D(16, kernel_size=(3, 3), activation='relu', input_shape=x_train.shape[1:], kernel_regularizer=tf.keras.regularizers.l2(reg_strength)),
+    tf.keras.layers.MaxPooling2D(pool_size=(2, 2)),
+    tf.keras.layers.Dropout(dropout_rate),
+    tf.keras.layers.Conv2D(32, kernel_size=(3, 3), activation='relu', kernel_regularizer=tf.keras.regularizers.l2(reg_strength)),
+    tf.keras.layers.MaxPooling2D(pool_size=(2, 2)),
+    tf.keras.layers.Dropout(dropout_rate),
+    tf.keras.layers.Flatten(),
+    tf.keras.layers.Dense(64, activation='relu', kernel_regularizer=tf.keras.regularizers.l2(reg_strength)),
+    tf.keras.layers.Dropout(dropout_rate),
+    tf.keras.layers.Dense(1, activation='sigmoid')
+])
+
+cnn3.compile(
+    optimizer='adam',
+    loss='binary_crossentropy',
+    metrics=[
+        metrics.Recall(name='recall'),
+        metrics.Precision(name='precision'),
+        metrics.AUC(name='auc')
+        # F1 score personalizado si es necesario
+    ]
+)
+
+history3 = cnn3.fit(
+                x_train,
+                y_train,
+                batch_size=100,
+                epochs = 10,
+                validation_data = (x_val, y_val)
+)
+
+# Evaluar el modelo en el conjunto de prueba
+test_loss, test_recall, test_precision, test_auc = cnn3.evaluate(x_val, y_val)
+
+cnn3.summary()
+
+# Gráfica de Recall
+plt.plot(history3.history['recall'], label='Recall en el entrenamiento')
+plt.plot(history3.history['val_recall'], label='Recall en la validación')
+plt.title('Recall durante el entrenamiento')
+plt.xlabel('Épocas')
+plt.ylabel('Recall')
+plt.legend()
+plt.show()
+
+# Gráfica de Precisión
+plt.plot(history3.history['precision'], label='Precisión en el entrenamiento')
+plt.plot(history3.history['val_precision'], label='Precisión en la validación')
+plt.title('Precisión durante el entrenamiento')
+plt.xlabel('Épocas')
+plt.ylabel('Precisión')
+plt.legend()
+plt.show()
+
+# Gráfica de AUC
+plt.plot(history3.history['auc'], label='AUC en el entrenamiento')
+plt.plot(history3.history['val_auc'], label='AUC en la validación')
+plt.title('AUC durante el entrenamiento')
+plt.xlabel('Épocas')
+plt.ylabel('AUC')
+plt.legend()
+plt.show()
+
+# Gráfica de Pérdida
+plt.plot(history3.history['loss'], label='Pérdida en el entrenamiento')
+plt.plot(history3.history['val_loss'], label='Pérdida en la validación')
+plt.title('Pérdida durante el entrenamiento')
+plt.xlabel('Épocas')
+plt.ylabel('Pérdida')
+plt.legend()
+plt.show()
+
+# ------------------------------------------ CNN4 ------------------------------------------ #
+
+def create_cnn_model(input_shape=(100, 100, 3)):
+    model = Sequential([
+        # Primera capa convolucional
+        Conv2D(32, (3, 3), activation='relu', input_shape=input_shape),
+        BatchNormalization(),
+        MaxPooling2D((2, 2)),
+        
+        # Segunda capa convolucional
+        Conv2D(64, (3, 3), activation='relu'),
+        BatchNormalization(),
+        MaxPooling2D((2, 2)),
+        
+        # Tercera capa convolucional
+        Conv2D(128, (3, 3), activation='relu'),
+        BatchNormalization(),
+        MaxPooling2D((2, 2)),
+        
+        # Cuarta capa convolucional
+        Conv2D(256, (3, 3), activation='relu'),
+        BatchNormalization(),
+        MaxPooling2D((2, 2)),
+        
+        # Capa de aplanamiento
+        Flatten(),
+        
+        # Capa densa totalmente conectada
+        Dense(256, activation='relu'),
+        Dropout(0.5),
+        
+        # Capa de salida
+        Dense(1, activation='sigmoid')  # Para clasificación binaria
+    ])
+    
+    # Compilar el modelo
+    model.compile(
+    optimizer='adam',
+    loss='binary_crossentropy',
+    metrics=[
+        metrics.Recall(name='recall'),
+        metrics.Precision(name='precision'),
+        metrics.AUC(name='auc')])
+
+    return model
+
+# Crear el modelo y mostrar su resumen
+model = create_cnn_model()
+model.summary()
+
+history4 = model.fit(
+                x_train,
+                y_train,
+                batch_size=100,
+                epochs = 10,
+                validation_data = (x_val, y_val)
+)
+
+# Evaluar el modelo en el conjunto de prueba
+test_loss, test_recall, test_precision, test_auc = model.evaluate(x_val, y_val)
+
+# Gráfica de Recall
+plt.plot(history4.history['recall'], label='Recall en el entrenamiento')
+plt.plot(history4.history['val_recall'], label='Recall en la validación')
+plt.title('Recall durante el entrenamiento')
+plt.xlabel('Épocas')
+plt.ylabel('Recall')
+plt.legend()
+plt.show()
+
+# Gráfica de Precisión
+plt.plot(history4.history['precision'], label='Precisión en el entrenamiento')
+plt.plot(history4.history['val_precision'], label='Precisión en la validación')
+plt.title('Precisión durante el entrenamiento')
+plt.xlabel('Épocas')
+plt.ylabel('Precisión')
+plt.legend()
+plt.show()
+
+# Gráfica de AUC
+plt.plot(history4.history['auc'], label='AUC en el entrenamiento')
+plt.plot(history4.history['val_auc'], label='AUC en la validación')
+plt.title('AUC durante el entrenamiento')
+plt.xlabel('Épocas')
+plt.ylabel('AUC')
+plt.legend()
+plt.show()
+
+# Gráfica de Pérdida
+plt.plot(history4.history['loss'], label='Pérdida en el entrenamiento')
+plt.plot(history4.history['val_loss'], label='Pérdida en la validación')
+plt.title('Pérdida durante el entrenamiento')
+plt.xlabel('Épocas')
+plt.ylabel('Pérdida')
+plt.legend()
+plt.show()
