@@ -103,9 +103,7 @@ cnn1.compile(
     loss='binary_crossentropy',
     metrics=[
         metrics.Recall(name='recall'),
-        metrics.Precision(name='precision'),
         metrics.AUC(name='auc')
-        # F1 score personalizado si es necesario
     ]
 )
 
@@ -123,12 +121,12 @@ keras.utils.plot_model(
 history1 = cnn1.fit(
                 x_train,
                 y_train,
-                epochs = 20,
-                validation_data = (x_test, y_test)
+                epochs = 10,
+                validation_data = (x_val, y_val)
 )
 
 # Evaluar el modelo en el conjunto de prueba
-test_loss, test_recall, test_precision, test_auc = cnn1.evaluate(x_test, y_test)
+test_loss, test_recall, test_auc = cnn1.evaluate(x_val, y_val)
 
 # Gráfica de Recall
 plt.plot(history1.history['recall'], label='Recall en el entrenamiento')
@@ -136,15 +134,6 @@ plt.plot(history1.history['val_recall'], label='Recall en la validación')
 plt.title('Recall durante el entrenamiento')
 plt.xlabel('Épocas')
 plt.ylabel('Recall')
-plt.legend()
-plt.show()
-
-# Gráfica de Precisión
-plt.plot(history1.history['precision'], label='Precisión en el entrenamiento')
-plt.plot(history1.history['val_precision'], label='Precisión en la validación')
-plt.title('Precisión durante el entrenamiento')
-plt.xlabel('Épocas')
-plt.ylabel('Precisión')
 plt.legend()
 plt.show()
 
@@ -167,11 +156,11 @@ plt.legend()
 plt.show()
 
 # Obtener las predicciones en el conjunto de prueba
-y_pred_probs = cnn1.predict(x_test)
+y_pred_probs = cnn1.predict(x_val)
 y_pred = np.round(y_pred_probs).astype(int)  # Redondear para obtener 0 o 1
 
 # Generar la matriz de confusión
-cm1 = confusion_matrix(y_test, y_pred)
+cm1 = confusion_matrix(y_val, y_pred)
 # Visualizar la matriz de confusión
 plt.figure(figsize=(6, 4))
 sns.heatmap(cm1, annot=True, fmt='d', cmap='Blues', xticklabels=['Negativo', 'Positivo'], yticklabels=['Negativo', 'Positivo'])
@@ -180,7 +169,19 @@ plt.ylabel('Valor Real')
 plt.title('Matriz de Confusión')
 plt.show()
 
-report = classification_report(y_test, y_pred, target_names=['Negativo', 'Positivo'])
+# Imprimir el Recall y AUC de la última época para el conjunto de entrenamiento y validación
+final_train_recall = history1.history['recall'][-1]
+final_val_recall = history1.history['val_recall'][-1]
+final_train_auc = history1.history['auc'][-1]
+final_val_auc = history1.history['val_auc'][-1]
+
+print(f"Recall en el conjunto de entrenamiento (última época): {final_train_recall:.4f}")
+print(f"Recall en el conjunto de validación (última época): {final_val_recall:.4f}")
+print(f"AUC en el conjunto de entrenamiento (última época): {final_train_auc:.4f}")
+print(f"AUC en el conjunto de validación (última época): {final_val_auc:.4f}")
+
+
+report = classification_report(y_val, y_pred, target_names=['Negativo', 'Positivo'])
 print("Reporte de Clasificación:")
 print(report)
 
