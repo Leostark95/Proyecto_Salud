@@ -95,7 +95,7 @@ print(df_summary)
 
 # ---------------------------------- Función img2data aplicada ------------------------------ #
 
-rawImgs, labels, _ = img2data(dataset_dir + "/train/")
+rawImgs, labels, _ = fn.img2data(dataset_dir + "/train/")
 
 # ---------------------------------- Visualización de imágenes ------------------------------ #
 
@@ -120,56 +120,6 @@ plot_images(data, label=0, num_images=num_images)
 print("Muestras de Imágenes Malignas (Clase 1):")
 plot_images(data, label=1, num_images=num_images)
 
-# ---------------------------------------- Normalización ------------------------------------ #
-
-def normalize_images(images):
-    # Convertir lista de imágenes en un arreglo numpy y escalar a rango [0, 1]
-    images_normalized = np.array(images, dtype="float32") / 255.0
-    return images_normalized
-
-# Aplicar normalización
-rawImgs_normalized = normalize_images(rawImgs)
-
-# Confirmar si todas las imágenes tienen la misma dimensión
-unique_sizes = set(img.shape for img in rawImgs_normalized)
-if len(unique_sizes) == 1:
-    print("\nTodas las imágenes normalizadas tienen las mismas dimensiones:", unique_sizes.pop())
-else:
-    print("\nLas imágenes tienen diferentes dimensiones:", unique_sizes)
-
-# --------------------------------------- Aumento de datos ---------------------------------- #
-
-# Definir una secuencia de aumento de datos
-
-def augment_images(images):
-    augmentation_pipeline = iaa.Sequential([
-    iaa.Fliplr(0.5),                       # 50% de probabilidad de aplicar espejado horizontal
-    iaa.Rotate((-15, 15)),                 # Rotar entre -15 y 15 grados
-    iaa.Multiply((0.8, 1.2)),              # Ajuste de brillo entre 80% y 120%
-    iaa.GaussianBlur(sigma=(0.0, 1.0))])   # Aplicar desenfoque gaussiano leve
-    # Aplicar el aumento de datos a las imágenes
-    images_augmented = augmentation_pipeline(images=images)
-    return images_augmented
-
-def plot_image_samples(images, title, num_images=5):
-    plt.figure(figsize=(15, 5))
-    for i in range(num_images):
-        plt.subplot(1, num_images, i + 1)
-        plt.imshow(images[i], cmap='gray' if images[i].ndim == 2 else None)
-        plt.axis('off')
-    plt.suptitle(title)
-    plt.show()
-
-plot_image_samples(rawImgs, title="Imágenes Originales")
-
-# Normalizar las imágenes
-rawImgs_normalized = normalize_images(rawImgs)
-plot_image_samples(rawImgs_normalized, title="Imágenes Normalizadas")
-
-# Aplicar aumento de datos (data augmentation) solo al conjunto de entrenamiento
-rawImgs_augmented = augment_images(rawImgs_normalized)
-plot_image_samples(rawImgs_augmented, title="Imágenes con Aumento de Datos")
-
 # -------------------------------------- Train, Test, Valid --------------------------------- #
 
 # para cargar todas las imágenes
@@ -180,22 +130,15 @@ testpath = 'data/test/'
 valpath = 'data/valid/'
 
 x_train, y_train, file_list= fn.img2data(trainpath)
+x_test, y_test, file_list= fn.img2data(testpath)
+x_val, y_val, file_list= fn.img2data(valpath)
 
-# Normalizar las imágenes y actualizar x_train
-x_train_norm = normalize_images(x_train)
-plot_image_samples(x_train, title="Imágenes Normalizadas")
-
-# Aplicar aumento de datos y actualizar x_train
-x_train_aug = augment_images(x_train)
-plot_image_samples(x_train, title="Imágenes con Aumento de Datos")
-
-x_train = []
-
-x_train.append(x_train_norm)
-x_train.append(x_train_aug)
-
-print(len(x_train_norm))
-
+joblib.dump(x_train, 'salidas/x_train.pkl')
+joblib.dump(y_train, 'salidas/y_train.pkl')
+joblib.dump(x_test,'salidas/x_test.pkl')
+joblib.dump(y_test, 'salidas/y_test.pkl')
+joblib.dump(x_val, 'salidas/x_val.pkl')
+joblib.dump(y_val, 'salidas/y_val.pkl')
 
 
 
