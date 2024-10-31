@@ -412,3 +412,126 @@ plt.xlabel('Épocas')
 plt.ylabel('Pérdida')
 plt.legend()
 plt.show()
+
+
+# ------------------------------------------ CNN5 ------------------------------------------ #
+import keras_tuner as kt
+
+hp = kt.HyperParameters()
+
+# Definición del modelo con Hiperparámetros
+def build_model(hp):
+    # Definición de hiperparámetros a afinar
+    dropout_rate = hp.Float('DO', min_value=0.05, max_value=0.2, step=0.05)
+    reg_strength = hp.Float("rs", min_value=0.0001, max_value=0.0005, step=0.0001)
+
+    # Creación del modelo
+    model = tf.keras.Sequential([
+        tf.keras.layers.Conv2D(8, kernel_size=(3, 3), activation='relu', input_shape=x_train.shape[1:], kernel_regularizer=tf.keras.regularizers.l2(reg_strength)),
+        tf.keras.layers.MaxPooling2D(pool_size=(2, 2), ),
+        tf.keras.layers.Dropout(dropout_rate),
+        tf.keras.layers.Conv2D(16, kernel_size=(3, 3), activation='relu', kernel_regularizer=tf.keras.regularizers.l2(reg_strength)),
+        tf.keras.layers.MaxPooling2D(pool_size=(2, 2), ),
+        tf.keras.layers.Dropout(dropout_rate),
+        tf.keras.layers.Flatten(),
+        tf.keras.layers.Dense(64, activation='relu', kernel_regularizer=tf.keras.regularizers.l2(reg_strength)),
+        tf.keras.layers.Dropout(dropout_rate),
+        tf.keras.layers.Dense(1, activation='sigmoid')
+    ])
+    
+    # Fijar optimizador en Adam con tasa de aprendizaje definida
+    opt = tf.keras.optimizers.Adam(learning_rate=0.001)
+   
+    model.compile(
+        optimizer=opt,
+        loss="binary_crossentropy",
+        metrics=[metrics.Recall(name='recall'), metrics.Precision(name='precision'), metrics.AUC(name='auc')]
+    )
+    
+    return model
+
+# Configuración del sintonizador
+tuner = kt.RandomSearch(
+    hypermodel=build_model,
+    objective=kt.Objective("val_recall", direction="max"),
+    max_trials=5,  # Ajusta el número de pruebas para más exploración si es necesario
+    overwrite=True,
+    directory="my_dir",
+    project_name="modelo_afinado"
+)
+
+# Ejecución de la búsqueda de hiperparámetros
+tuner.search(x_train, y_train, epochs=10, validation_data=(x_val, y_val), batch_size=100)
+
+# Selección del mejor modelo
+best_model = tuner.get_best_models(num_models=1)[0]
+
+# Resumen de resultados del tuner
+tuner.results_summary()
+best_model.summary()
+
+# Evaluación del mejor modelo en el conjunto de prueba
+test_loss, test_recall, test_auc = best_model.evaluate(x_val, y_val)
+print(f"Recall en prueba: {test_recall}, Precision en prueba: {test_precision}, AUC en prueba: {test_auc}")
+
+# Generación de predicciones
+pred_test = (best_model.predict(x_val) >= 0.50).astype('int')
+
+# Guardar el modelo ajustado
+#best_model.save('salidas/best_model.h5')
+
+
+# Entrenamiento del modelo y almacenamiento de las métricas en 'history'
+history = best_model.fit(x_train, y_train, epochs=10, validation_data=(x_val, y_val), batch_size=100)
+
+# Imprimir métricas por época
+for epoch in range(len(history.history['loss'])):
+    print(f"Época {epoch+1}:")
+    print(f"  Pérdida en entrenamiento: {history.history['loss'][epoch]}")
+    print(f"  Recall en entrenamiento: {history.history['recall'][epoch]}")
+    print(f"  AUC en entrenamiento: {history.history['auc'][epoch]}")
+    print(f"  Pérdida en validación: {history.history['val_loss'][epoch]}")
+    print(f"  Recall en validación: {history.history['val_recall'][epoch]}")
+    print(f"  AUC en validación: {history.history['val_auc'][epoch]}")
+    print("")
+
+# Graficar las métricas durante el entrenamiento
+def plot_perdida(history):
+    # Pérdida
+    plt.figure(figsize=(12, 8))
+    plt.subplot(2, 2, 1)
+    plt.plot(history.history['loss'], label='Pérdida en entrenamiento')
+    plt.plot(history.history['val_loss'], label='Pérdida en validación')
+    plt.title('Pérdida durante el entrenamiento')
+    plt.xlabel('Épocas')
+    plt.ylabel('Pérdida')
+    plt.legend()
+
+def plot_recall(history):
+    # Recall
+    plt.subplot(2, 2, 2)
+    plt.plot(history.history['recall'], label='Recall en entrenamiento')
+    plt.plot(history.history['val_recall'], label='Recall en validación')
+    plt.title('Recall durante el entrenamiento')
+    plt.xlabel('Épocas')
+    plt.ylabel('Recall')
+    plt.legend()
+
+def plot_auc(history):
+    # AUC
+    plt.subplot(2, 2, 4)
+    plt.plot(history.history['auc'], label='AUC en entrenamiento')
+    plt.plot(history.history['val_auc'], label='AUC en validación')
+    plt.title('AUC durante el entrenamiento')
+    plt.xlabel('Épocas')
+    plt.ylabel('AUC')
+    plt.legend()
+
+    plt.tight_layout()
+    plt.show()
+
+# Llamada a la función para graficar
+plot_perdida(history)
+plot_recall(history)
+plot_auc(history)
+
