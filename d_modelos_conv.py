@@ -230,14 +230,6 @@ plt.ylabel('Recall')
 plt.legend()
 plt.show()
 
-# Gráfica de Precisión
-plt.plot(history2.history['precision'], label='Precisión en el entrenamiento')
-plt.plot(history2.history['val_precision'], label='Precisión en la validación')
-plt.title('Precisión durante el entrenamiento')
-plt.xlabel('Épocas')
-plt.ylabel('Precisión')
-plt.legend()
-plt.show()
 
 # Gráfica de AUC
 plt.plot(history2.history['auc'], label='AUC en el entrenamiento')
@@ -313,14 +305,6 @@ plt.ylabel('Recall')
 plt.legend()
 plt.show()
 
-# Gráfica de Precisión
-plt.plot(history3.history['precision'], label='Precisión en el entrenamiento')
-plt.plot(history3.history['val_precision'], label='Precisión en la validación')
-plt.title('Precisión durante el entrenamiento')
-plt.xlabel('Épocas')
-plt.ylabel('Precisión')
-plt.legend()
-plt.show()
 
 # Gráfica de AUC
 plt.plot(history3.history['auc'], label='AUC en el entrenamiento')
@@ -410,14 +394,6 @@ plt.ylabel('Recall')
 plt.legend()
 plt.show()
 
-# Gráfica de Precisión
-plt.plot(history4.history['precision'], label='Precisión en el entrenamiento')
-plt.plot(history4.history['val_precision'], label='Precisión en la validación')
-plt.title('Precisión durante el entrenamiento')
-plt.xlabel('Épocas')
-plt.ylabel('Precisión')
-plt.legend()
-plt.show()
 
 # Gráfica de AUC
 plt.plot(history4.history['auc'], label='AUC en el entrenamiento')
