@@ -21,14 +21,20 @@ from tensorflow.keras.utils import plot_model
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense, Dropout, BatchNormalization
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
+from tensorflow.keras.optimizers import Adam
+from tensorflow.keras.losses import BinaryCrossentropy
 from keras_tuner import RandomSearch
 
-x_train = joblib.load('salidas\\x_train.pkl')
-y_train = joblib.load('salidas\\y_train.pkl')
-x_test = joblib.load('salidas\\x_test.pkl')
-y_test = joblib.load('salidas\\y_test.pkl')
-x_val = joblib.load('salidas\\x_val.pkl')
-y_val = joblib.load('salidas\\y_val.pkl')
+#x_train = joblib.load('salidas\\x_train.pkl')
+#y_train = joblib.load('salidas\\y_train.pkl')
+#x_test = joblib.load('salidas\\x_test.pkl')
+#y_test = joblib.load('salidas\\y_test.pkl')
+#x_val = joblib.load('salidas\\x_val.pkl')
+#y_val = joblib.load('salidas\\y_val.pkl')
+
+#Como se tienen tanto inconvniente con el peso de los archivos 
+#toca procesarlos cada vez
+x_train, y_train, x_test, y_test, x_val, y_val = fn.imag_array()
 
 x_train = x_train.astype('float32') ## para poder escalarlo
 x_test = x_test.astype('float32') ## para poder escalarlo
@@ -44,6 +50,8 @@ x_val /=255
 x_train.shape
 x_test.shape
 x_val.shape
+
+
 
 # ------------------------------------------ CNN1 ------------------------------------------ #
 
@@ -461,11 +469,6 @@ plot_auc(history)
 
 # ------------------------------------------ CNN7 ------------------------------------------ #
 
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense, Dropout
-from tensorflow.keras.optimizers import Adam
-from tensorflow.keras.losses import BinaryCrossentropy
-
 # Definir la arquitectura de la red CNN
 cnn7 = Sequential([
     Conv2D(8, (3, 3), activation='relu', input_shape=(224, 224, 3)),
@@ -490,10 +493,6 @@ cnn7.compile(
     loss=BinaryCrossentropy(),
     metrics=['recall', 'auc']
 )
-
-from tensorflow.keras.preprocessing.image import ImageDataGenerator
-
-from tensorflow.keras.preprocessing.image import ImageDataGenerator
 
 datagen = ImageDataGenerator(
     rescale=1.0/255,
@@ -573,16 +572,15 @@ print(f"AUC en el conjunto de validación (última época): {final_val_auc7:.4f}
 # ------------------------------------------ CNN7 ------------------------------------------ #
 # ------------------------------ Afinamiento de la red CNN7 -------------------------------- #
 
+
+class_weight = {0: 1.0, 1: 3.0}  # Ajusta según el rendimiento de entrenamiento
+
 hp = kt.HyperParameters()
 
 def build_model(hp):
-    
-    dropout_rate = hp.Float('DO', min_value=0.05, max_value= 0.2, step=0.05)
+    dropout_rate = hp.Float('DO', min_value=0.05, max_value=0.2, step=0.05)
     reg_strength = hp.Float("rs", min_value=0.0001, max_value=0.0005, step=0.0001)
-    optimizer = hp.Choice('optimizer', ['adam', 'sgd']) ### en el contexto no se debería afinar
-   
-    ####hp.Int
-    ####hp.Choice
+    optimizer = hp.Choice('optimizer', ['adam', 'sgd'])  # No afinar en este contexto
     
     cnn7 = Sequential([
         Conv2D(8, (3, 3), activation='relu', input_shape=(224, 224, 3)),
@@ -598,7 +596,7 @@ def build_model(hp):
         Dropout(0.5),
         Dense(64, activation='relu'),
         Dropout(0.5),
-        Dense(1, activation='sigmoid')  # Salida binaria para detección de tumor benigno o maligno
+        Dense(1, activation='sigmoid')  
     ])
     
     if optimizer == 'adam':
@@ -624,20 +622,20 @@ tuner = kt.RandomSearch(
     project_name="helloworld", 
 )
 
-tuner.search(x_train, y_train, epochs=20, validation_data=(x_val, y_val), batch_size=100)
+tuner.search(x_train, y_train, epochs=20, validation_data=(x_val, y_val), 
+             batch_size=100, class_weight=class_weight)
 
 fc_best_model = tuner.get_best_models(num_models=1)[0]
 
 tuner.results_summary()
 fc_best_model.summary()
 
-# Evaluar el mejor modelo en el conjunto de validación y obtener las métricas
 val_loss, val_recall, val_auc = fc_best_model.evaluate(x_val, y_val)
 print(f"Evaluación en el conjunto de validación: ")
 print(f"Loss: {val_loss:.4f}, Recall: {val_recall:.4f}, AUC: {val_auc:.4f}")
 
-# val_loss, val_auc = fc_best_model.evaluate(x_val, y_val)
-pred_val = (fc_best_model.predict(x_test)>=0.50).astype('int')
+# Realizar predicciones sobre el conjunto de prueba
+pred_val = (fc_best_model.predict(x_test) >= 0.50).astype('int')
 
 #################### exportar modelo afinado ##############
 fc_best_model.save('salidas\\best_model.keras')

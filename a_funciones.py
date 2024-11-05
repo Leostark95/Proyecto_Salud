@@ -36,9 +36,9 @@ def imag_array():
     testpath = 'data/test/'
     valpath = 'data/valid/'
 
-    x_train, y_train, file_list= fn.img2data(trainpath)
-    x_test, y_test, file_list= fn.img2data(testpath)
-    x_val, y_val, file_list= fn.img2data(valpath)
+    x_train, y_train, file_list= img2data(trainpath)
+    x_test, y_test, file_list= img2data(testpath)
+    x_val, y_val, file_list= img2data(valpath)
 
     #### convertir salidas a numpy array ####
     x_train = np.array(x_train)

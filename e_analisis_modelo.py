@@ -8,15 +8,20 @@ import pandas as pd
 
 import seaborn as sns
 import matplotlib.pyplot as plt
+import a_funciones as fn
 
 
 
-x_train = joblib.load('salidas\\x_train.pkl')
-y_train = joblib.load('salidas\\y_train.pkl')
-x_test = joblib.load('salidas\\x_test.pkl')
-y_test = joblib.load('salidas\\y_test.pkl')
-x_val = joblib.load('salidas\\x_val.pkl')
-y_val = joblib.load('salidas\\y_val.pkl')
+#x_train = joblib.load('salidas\\x_train.pkl')
+#y_train = joblib.load('salidas\\y_train.pkl')
+#x_test = joblib.load('salidas\\x_test.pkl')
+#y_test = joblib.load('salidas\\y_test.pkl')
+#x_val = joblib.load('salidas\\x_val.pkl')
+#y_val = joblib.load('salidas\\y_val.pkl')
+
+
+x_train, y_train, x_test, y_test, x_val, y_val = fn.imag_array()
+
 
 #### Escalar ######################
 x_train=x_train.astype('float32') ## para poder escalarlo
@@ -28,22 +33,22 @@ x_test /=255
 
 ##### cargar modelo  ######
 
-modelo=tf.keras.models.load_model('salidas\\fc_model.h5')
+modelo=tf.keras.models.load_model('salidas/best_model.keras')
 
 
 
-####desempeño en evaluación para grupo 1 (tienen neumonía) #######
+####desempeño en evaluación para grupo 1 (tienen cancer) #######
 prob=modelo.predict(x_test)
 sns.histplot(prob, legend=False)
 plt.title("probabilidades imágenes en entrenamiento")### conocer el comportamiento de las probabilidades para revisar threshold
 
 
-threshold_neu=0.508
+threshold_mal=0.70
 
-pred_test=(modelo.predict(x_test)>=threshold_neu).astype('int')
+pred_test=(modelo.predict(x_test)>=threshold_mal).astype('int')
 print(metrics.classification_report(y_test, pred_test))
 cm=metrics.confusion_matrix(y_test,pred_test, labels=[1,0])
-disp=metrics.ConfusionMatrixDisplay(cm,display_labels=['Pneu', 'Normal'])
+disp=metrics.ConfusionMatrixDisplay(cm,display_labels=['Maligno', 'Benigno'])
 disp.plot()
 
 
@@ -53,7 +58,7 @@ prob=modelo.predict(x_train)
 sns.histplot(prob, legend=False)
 plt.title("probabilidades imágenes en entrenamiento")### conocer el comportamiento de las probabilidades para revisar threshold
 
-pred_train=(prob>=threshold_neu).astype('int')
+pred_train=(prob>=threshold_mal).astype('int')
 print(metrics.classification_report(y_train, pred_train))
 cm=metrics.confusion_matrix(y_train,pred_train, labels=[1,0])
 disp=metrics.ConfusionMatrixDisplay(cm,display_labels=['Pneu', 'Normal'])
@@ -76,7 +81,6 @@ print(metrics.classification_report(y_test, pred_test))
 cm=metrics.confusion_matrix(y_test,pred_test, labels=[1,0])
 disp=metrics.ConfusionMatrixDisplay(cm,display_labels=['Pneu', 'Normal'])
 disp.plot()
-
 
 
 ### desempeño en entrenamiento #####
