@@ -28,3 +28,24 @@ def img2data(path, width=224):
                 elif l == '1':
                     labels.append([1])
     return rawImgs, labels, files_list
+
+#Función para convertir a array
+def imag_array():
+
+    trainpath = 'data/train/'
+    testpath = 'data/test/'
+    valpath = 'data/valid/'
+
+    x_train, y_train, file_list= fn.img2data(trainpath)
+    x_test, y_test, file_list= fn.img2data(testpath)
+    x_val, y_val, file_list= fn.img2data(valpath)
+
+    #### convertir salidas a numpy array ####
+    x_train = np.array(x_train)
+    y_train = np.array(y_train)
+    x_test = np.array(x_test)
+    y_test = np.array(y_test)
+    x_val = np.array(x_val)
+    y_val = np.array(y_val)
+
+    return x_train, y_train, x_test, y_test, x_val, y_val
