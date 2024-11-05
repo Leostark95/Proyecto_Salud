@@ -5,7 +5,7 @@ from os import listdir # para hacer lista de archivos en una ruta
 from tqdm import tqdm  # para crear contador en un for para ver evolución
 from os.path import join # para unir ruta con archivo 
 
-def img2data(path, width=100):
+def img2data(path, width=224):
     
     rawImgs = []   # una lista con el array que representa cada imágen
     labels = [] # el label de cada imágen
