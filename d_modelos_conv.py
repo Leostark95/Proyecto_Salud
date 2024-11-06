@@ -506,7 +506,7 @@ datagen = ImageDataGenerator(
 )
 
 # Definir pesos de clases, dando mayor peso a la clase 1 (maligna)
-class_weight = {0: 1.0, 1: 3.0}  # Ajusta según el rendimiento de entrenamiento
+class_weight = {0: 1.0, 1: 2.0}  # Ajusta según el rendimiento de entrenamiento
 
 history7 = cnn7.fit(
     x_train, y_train, # Datos de entrenamiento
@@ -574,7 +574,7 @@ print(f"AUC en el conjunto de validación (última época): {final_val_auc7:.4f}
 # ------------------------------ Afinamiento de la red CNN7 -------------------------------- #
 
 
-class_weight = {0: 1.0, 1: 3.0}  # Ajusta según el rendimiento de entrenamiento
+class_weight = {0: 1.0, 1: 2.0}  # Ajusta según el rendimiento de entrenamiento
 
 hp = kt.HyperParameters()
 
@@ -582,7 +582,7 @@ def build_model(hp):
     dropout_rate = hp.Float('DO', min_value=0.05, max_value=0.2, step=0.05)
     reg_strength = hp.Float("rs", min_value=0.0001, max_value=0.0005, step=0.0001)
     optimizer = hp.Choice('optimizer', ['adam', 'sgd'])  # No afinar en este contexto
-    
+
     cnn7 = Sequential([
         Conv2D(8, (3, 3), activation='relu', input_shape=(224, 224, 3)),
         MaxPooling2D((2, 2)),
@@ -599,17 +599,7 @@ def build_model(hp):
         Dropout(0.5),
         Dense(1, activation='sigmoid')  
     ])
-    
-    if optimizer == 'adam':
-        opt = tf.keras.optimizers.Adam(learning_rate=0.001)
-    elif optimizer == 'sgd':
-        opt = tf.keras.optimizers.SGD(learning_rate=0.001)
-    else:
-        opt = tf.keras.optimizers.RMSprop(learning_rate=0.001)
-   
-    cnn7.compile(
-        optimizer=opt, loss="binary_crossentropy", metrics=["Recall", "AUC"],
-    ) 
+
     return cnn7
 
 tuner = kt.RandomSearch(
@@ -640,3 +630,4 @@ pred_val = (fc_best_model.predict(x_test) >= 0.50).astype('int')
 
 #################### exportar modelo afinado ##############
 fc_best_model.save('salidas\\best_model.keras')
+

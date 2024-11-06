@@ -13,7 +13,7 @@ sys.path
 if __name__=="__main__":
 
     #### cargar datos ####
-    path = ''
+    path = 'Anexar path con los datos para realizar el despliegue'
     x, _, files= fn.img2data(path) #cargar datos de despliegue
 
     x=np.array(x) ##imagenes a predecir
@@ -28,7 +28,7 @@ if __name__=="__main__":
     prob=modelo.predict(x)
 
 
-    clas=['Neu' if prob >0.508 else 'No Neu' if prob <0.5015 else "No ident" for prob in prob]
+    clas=['Prob alta' if prob >0.573 else 'Prob baja' if prob <0.55 else "Prob media" for prob in prob]
 
     res_dict={
         "paciente": files2,
@@ -36,4 +36,4 @@ if __name__=="__main__":
     }
     resultados=pd.DataFrame(res_dict)
 
-    resultados.to_excel('csalidas/clasificados.xlsx', index=False)
+    resultados.to_excel('salidas/clasificados.xlsx', index=False)
