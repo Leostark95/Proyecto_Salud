@@ -34,6 +34,7 @@ from keras_tuner import RandomSearch
 
 #Como se tienen tanto inconvniente con el peso de los archivos 
 #toca procesarlos cada vez
+
 x_train, y_train, x_test, y_test, x_val, y_val = fn.imag_array()
 
 x_train = x_train.astype('float32') ## para poder escalarlo
@@ -639,4 +640,3 @@ pred_val = (fc_best_model.predict(x_test) >= 0.50).astype('int')
 
 #################### exportar modelo afinado ##############
 fc_best_model.save('salidas\\best_model.keras')
-

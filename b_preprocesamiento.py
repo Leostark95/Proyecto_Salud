@@ -61,6 +61,14 @@ plt.show()
 np.prod(img2_r.shape)
 
 # --------------------------------- Distribuciones de las clases ---------------------------- #
+import cv2
+import numpy as np
+from os import listdir
+from os.path import join
+from tqdm import tqdm
+
+
+
 
 dataset_dir = 'data'
 
@@ -96,7 +104,6 @@ print(df_summary)
 # ---------------------------------- Función img2data aplicada ------------------------------ #
 
 rawImgs, labels, _ = fn.img2data(dataset_dir + "/train/")
-
 # ---------------------------------- Visualización de imágenes ------------------------------ #
 
 num_images = 5
@@ -146,6 +153,7 @@ x_test.shape
 x_val.shape
 
 # ----------------------- salidas del preprocesamiento bases listas ------------------------- #
+
 
 joblib.dump(x_train, 'salidas/x_train.pkl')
 joblib.dump(y_train, 'salidas/y_train.pkl')
