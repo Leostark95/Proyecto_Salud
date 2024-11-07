@@ -37,3 +37,5 @@ if __name__=="__main__":
     resultados=pd.DataFrame(res_dict)
 
     resultados.to_excel('salidas/clasificados.xlsx', index=False)
+    
+    
