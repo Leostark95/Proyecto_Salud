@@ -10,6 +10,7 @@ import sys
 sys.executable
 sys.path
 
+
 if __name__=="__main__":
 
     #### cargar datos ####

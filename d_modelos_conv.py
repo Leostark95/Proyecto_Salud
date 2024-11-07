@@ -223,13 +223,13 @@ datagen = ImageDataGenerator(
 )
 
 # Definir pesos de clases, dando mayor peso a la clase 1 (maligna)
-class_weight = {0: 1.0, 1: 2.0}  # Ajusta según el rendimiento de entrenamiento
+class_weight = {0: 1.0, 1: 2.0}  
 
 history7 = cnn7.fit(
-    x_train, y_train, # Datos de entrenamiento
-    validation_data=(x_val, y_val),  # Datos de validación
-    epochs=10,  # Número de épocas de entrenamiento
-    class_weight=class_weight,  # Aplicar el class_weight
+    x_train, y_train, 
+    validation_data=(x_val, y_val),  
+    epochs=10,  
+    class_weight=class_weight,  
     batch_size=32
 )
 
@@ -246,6 +246,7 @@ y_pred7 = np.round(y_pred_probs7).astype(int)  # Redondear para obtener 0 o 1
 
 # Generar la matriz de confusión
 cm7 = confusion_matrix(y_val, y_pred7)
+
 # Visualizar la matriz de confusión
 fn.matriz(cm7)
 
@@ -262,7 +263,7 @@ print(f"AUC en el conjunto de validación (última época): {final_val_auc7:.4f}
 # ------------------------------------------ CNN7 ------------------------------------------ #
 # ------------------------------ Afinamiento de la red CNN7 -------------------------------- #
 
-# Ponderación de clases para balancear el entrenamiento
+
 class_weight = {0: 1.0, 1: 2.0}
 
 # Configuración de hiperparámetros
@@ -333,5 +334,7 @@ print(f"Loss: {val_loss:.4f}, Recall: {val_recall:.4f}, AUC: {val_auc:.4f}")
 
 # Realizar predicciones sobre el conjunto de validación
 pred_val = (fc_best_model.predict(x_val) >= 0.50).astype('int')
+
+
 #################### exportar modelo afinado ##############
 fc_best_model.save('salidas\\best_model.keras')

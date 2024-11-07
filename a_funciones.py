@@ -8,6 +8,19 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 def img2data(path, width=224, colormap=cv2.COLORMAP_VIRIDIS):
+    
+    """
+    Esta función procesa imágenes en un conjunto de datos, preparándolas para su análisis. 
+    Realiza una serie de transformaciones para resaltar características de interés, 
+    y aplica una codificación de colores para facilitar su visualización y clasificación.
+    
+    Parámetros:
+    - path (str): Ruta al directorio que contiene las subcarpetas con las imágenes.
+    - width (int): Tamaño al que se redimensionarán las imágenes (ancho y alto). Valor por defecto: 224.
+    - colormap (int): Mapa de color aplicado para mejorar la visualización de áreas específicas. 
+      Por defecto, usa el mapa de color COLORMAP_VIRIDIS.
+    """
+    
     rawImgs = []  # lista con arrays que representan cada imagen
     labels = []   # lista de etiquetas de cada imagen
     
@@ -53,6 +66,20 @@ def img2data(path, width=224, colormap=cv2.COLORMAP_VIRIDIS):
 #Función para convertir a array
 def imag_array():
 
+    """
+    Esta función organiza y convierte un conjunto de datos de imágenes en arrays de NumPy para su uso en modelos de machine learning. 
+    Carga imágenes desde tres directorios diferentes (entrenamiento, prueba y validación), las procesa y las convierte en arrays, 
+    junto con sus respectivas etiquetas.
+
+    Retorna:
+    - x_train (np.ndarray): Array con las imágenes de entrenamiento procesadas.
+    - y_train (np.ndarray): Array con las etiquetas correspondientes a las imágenes de entrenamiento.
+    - x_test (np.ndarray): Array con las imágenes de prueba procesadas.
+    - y_test (np.ndarray): Array con las etiquetas correspondientes a las imágenes de prueba.
+    - x_val (np.ndarray): Array con las imágenes de validación procesadas.
+    - y_val (np.ndarray): Array con las etiquetas correspondientes a las imágenes de validación.
+    """
+       
     trainpath = 'data/train/'
     testpath = 'data/test/'
     valpath = 'data/valid/'
@@ -83,6 +110,10 @@ def plot_recall(history1):
 
     # Gráfica de AUC
 def plot_auc(history1):
+    """
+    Esta función grafica el recall tanto en el conjunto de entrenamiento 
+    como en el conjunto de validación a lo largo de las épocas.
+    """
     plt.plot(history1.history['auc'], label='AUC en el entrenamiento')
     plt.plot(history1.history['val_auc'], label='AUC en la validación')
     plt.title('AUC durante el entrenamiento')
@@ -93,6 +124,10 @@ def plot_auc(history1):
 
     # Gráfica de Pérdida
 def plot_perdida(history1):
+    """
+    Esta función grafica la pérdida (loss) tanto en el conjunto de 
+    entrenamiento como en el conjunto de validación durante el entrenamiento.
+    """
     plt.plot(history1.history['loss'], label='Pérdida en el entrenamiento')
     plt.plot(history1.history['val_loss'], label='Pérdida en la validación')
     plt.title('Pérdida durante el entrenamiento')
@@ -103,6 +138,9 @@ def plot_perdida(history1):
 
 #Visualización matriz de confución
 def matriz(cm1):
+    """
+    Esta función visualiza una matriz de confusión utilizando un mapa de calor.
+    """
     plt.figure(figsize=(6, 4))
     sns.heatmap(cm1, annot=True, fmt='d', cmap='Blues', xticklabels=['Negativo', 'Positivo'], yticklabels=['Negativo', 'Positivo'])
     plt.xlabel('Predicción')
