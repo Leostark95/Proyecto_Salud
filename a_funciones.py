@@ -4,7 +4,8 @@ import cv2
 from os import listdir # para hacer lista de archivos en una ruta
 from tqdm import tqdm  # para crear contador en un for para ver evolución
 from os.path import join # para unir ruta con archivo 
-
+import matplotlib.pyplot as plt
+import seaborn as sns
 
 def img2data(path, width=224, colormap=cv2.COLORMAP_VIRIDIS):
     rawImgs = []  # lista con arrays que representan cada imagen
@@ -69,3 +70,42 @@ def imag_array():
     y_val = np.array(y_val)
 
     return x_train, y_train, x_test, y_test, x_val, y_val
+
+# Gráfica de Recall
+def plot_recall(history1):
+    plt.plot(history1.history['recall'], label='Recall en el entrenamiento')
+    plt.plot(history1.history['val_recall'], label='Recall en la validación')
+    plt.title('Recall durante el entrenamiento')
+    plt.xlabel('Épocas')
+    plt.ylabel('Recall')
+    plt.legend()
+    plt.show()
+
+    # Gráfica de AUC
+def plot_auc(history1):
+    plt.plot(history1.history['auc'], label='AUC en el entrenamiento')
+    plt.plot(history1.history['val_auc'], label='AUC en la validación')
+    plt.title('AUC durante el entrenamiento')
+    plt.xlabel('Épocas')
+    plt.ylabel('AUC')
+    plt.legend()
+    plt.show()
+
+    # Gráfica de Pérdida
+def plot_perdida(history1):
+    plt.plot(history1.history['loss'], label='Pérdida en el entrenamiento')
+    plt.plot(history1.history['val_loss'], label='Pérdida en la validación')
+    plt.title('Pérdida durante el entrenamiento')
+    plt.xlabel('Épocas')
+    plt.ylabel('Pérdida')
+    plt.legend()
+    plt.show()
+
+#Visualización matriz de confución
+def matriz(cm1):
+    plt.figure(figsize=(6, 4))
+    sns.heatmap(cm1, annot=True, fmt='d', cmap='Blues', xticklabels=['Negativo', 'Positivo'], yticklabels=['Negativo', 'Positivo'])
+    plt.xlabel('Predicción')
+    plt.ylabel('Valor Real')
+    plt.title('Matriz de Confusión')
+    plt.show()

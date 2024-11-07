@@ -13,6 +13,7 @@ from matplotlib import pyplot as plt
 from a_funciones import img2data
 from imgaug import augmenters as iaa
 
+
 # ---------------------------- Ejemplos de imágenes del dataset -------------------------------#
 
 # Lectura de imagenes
